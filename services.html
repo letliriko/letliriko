@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Services | LetLiriko</title><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav><b>LetLiriko</b><div><a href="index.html">Home</a><a href="services.html">Services</a></div></nav>
+
+<section class="deco-sec">
+  <span class="sticker small" style="right:2%;top:10px;--r:10deg">💌</span>
+  <h2>Preview 💌</h2>
+  <p>Pindot sa card para mabasa ang buong kwento.</p>
+  <div class="slider">
+    <button class="arrow l" onclick="slide(-1)" aria-label="Nakaraan">‹</button>
+    <div id="slides"></div>
+    <button class="arrow r" onclick="slide(1)" aria-label="Susunod">›</button>
+  </div>
+</section>
+
+<section class="deco-sec">
+  <span class="sticker small" style="left:1%;top:0;--r:-10deg">🎧</span>
+  <h2>Music 🎶</h2>
+  <div class="cols">
+    <div><h3>Pili ka ng kanta</h3><input id="songSearch" type="search" placeholder="Hanap ng kanta o artist..." aria-label="Hanap ng kanta">
+      <a id="spSearch" href="#" target="_blank" hidden>Hanapin sa Spotify</a>
+      <div id="songList"></div><div id="player"></div>
+      <details class="addsong"><summary>+ Magdagdag ng kanta</summary>
+        <form id="songForm">
+          <small>1. Hanapin ang kanta sa Spotify. 2. Share, tapos Copy Song Link. 3. I-paste dito.</small>
+          <input id="songLink" placeholder="https://open.spotify.com/track/..." required>
+          <input id="songTitle" placeholder="Title (optional, kusa naming kukunin)">
+          <input id="songArtist" placeholder="Artist (optional)">
+          <p id="songMsg" role="status"></p>
+          <button class="btn" type="submit">Idagdag</button>
+        </form></details></div>
+
+    <div>
+      <h3>Gawa ka ng entry</h3>
+      <form class="card" id="entryForm">
+        <span class="st">🌷</span><span class="st2">⭐</span>
+        <label for="title">Title (optional, ikaw bahala)</label>
+        <input id="title" maxlength="50" placeholder="Hal. Para sa bff ko">
+        <label>Kanta: <span id="formSong"></span></label>
+        <label for="meaning">Ano'ng meaning ng song na 'to sa'yo?</label>
+        <textarea id="meaning" rows="5" maxlength="400" placeholder="I-share mo na ang kwento mo..."></textarea>
+        <label for="from">Mula kay (codename o nickname)</label>
+        <input id="from" maxlength="25" placeholder="Hal. Kuya Mochi">
+        <label for="photo">Photo (optional)</label>
+        <input id="photo" type="file" accept="image/*">
+        <small>Kung walang photo, album ng kanta ang magiging background.</small>
+        <div id="photoPreview"></div>
+        <p id="msg" role="status"></p>
+        <button class="btn" type="submit">I-post na!</button>
+      </form>
+      <div class="credits" id="credits"></div>
+    </div>
+
+    <div><h3>Iba pang entries</h3><div id="entryList"></div></div>
+  </div>
+</section>
+
+<div id="modal" class="modal" hidden onclick="if(event.target===this)closeModal()">
+  <div class="modal-card" id="modalCard"></div>
+</div>
+
+<footer>
+  <span class="sticker small" style="left:8%;top:10px;--r:-8deg">🎵</span>
+  <span class="sticker small" style="right:8%;top:10px;--r:8deg;animation-delay:1s">💜</span>
+  <b>LetLiriko</b><p>"Bawat awit, may kuwentong nakatago."</p><p>letliriko &copy; 2026</p>
+</footer>
+<script src="entries.js"></script>
+<script src="song.js"></script>
+<script type="module" src="cloud.js"></script>
+</body></html>

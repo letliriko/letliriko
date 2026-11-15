@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Sulphur+Point:wght@400;700&family=Patrick+Hand&family=Caveat+Brush&display=swap');
+:root{--purple:#6b4fa0;--dark:#3d2a63;--beige:#f0e2cb;--off:#fbf8f3;--pink:#f4b6c9;--yellow:#f7d774}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Sulphur Point',sans-serif;background:var(--off);color:var(--dark);line-height:1.6}
+h1,h2,h3{font-family:'Caveat Brush',cursive;font-weight:400;margin:0 0 .4rem}
+h2{font-size:2.2rem;color:var(--purple)}
+a{color:var(--purple)}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+nav{display:flex;justify-content:space-between;align-items:center;padding:.8rem 1.5rem;background:var(--purple)}
+nav b{font-family:'Caveat Brush';font-size:1.6rem;color:var(--beige);font-weight:400}
+nav a{color:var(--off);text-decoration:none;margin-left:1.2rem;font-weight:700}
+nav a:hover{color:var(--yellow)}
+section{padding:2.5rem 1.5rem;max-width:1200px;margin:auto}
+.hero{text-align:center;background:var(--beige);max-width:none;position:relative;overflow:hidden}
+.tiles{display:flex;justify-content:center;gap:.4rem;flex-wrap:wrap;margin:1rem 0}
+.tile{width:3.2rem;height:3.2rem;background:#f5deb3;border:2px solid #c9a27c;border-radius:6px;
+  box-shadow:0 4px 0 #c9a27c;font:700 1.8rem 'Sulphur Point';display:grid;place-items:center;position:relative;color:var(--dark)}
+.tile:nth-child(even){transform:rotate(-4deg)}.tile:nth-child(odd){transform:rotate(3deg)}
+.tile i{position:absolute;right:3px;bottom:0;font:normal .6rem 'Sulphur Point'}
+.sticker{position:absolute;font-size:2.6rem;animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px) rotate(8deg)}}
+@media(prefers-reduced-motion:reduce){.sticker{animation:none}}
+.btn{display:inline-block;background:var(--purple);color:#fff;border:0;padding:.7rem 1.4rem;border-radius:30px;
+  font:700 1rem 'Sulphur Point';text-decoration:none;cursor:pointer;box-shadow:0 4px 0 var(--dark)}
+.about{max-width:700px;text-align:center}
+.about p{font-size:1.1rem}
+/* preview slides */
+.slider{position:relative}
+#slides{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;padding:.5rem;scrollbar-width:none}
+.slide{flex:0 0 min(320px,85%);height:220px;border-radius:16px;scroll-snap-align:start;background-size:cover;background-position:center;
+  position:relative;color:#fff;box-shadow:0 6px 14px #3d2a6340;overflow:hidden}
+.slide-emoji{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:4rem;opacity:.5}
+.slide-text{position:absolute;left:0;bottom:0;right:0;padding:.8rem 1rem;background:linear-gradient(transparent,#000a)}
+.slide-text small{font-size:.7rem;display:block}
+.slide-text h3{font-size:1.2rem;margin:0}
+.slide-text p{font-size:.8rem;margin:0}
+.arrow{position:absolute;top:45%;background:var(--yellow);border:0;border-radius:50%;width:2.4rem;height:2.4rem;cursor:pointer;font-size:1.2rem}
+.arrow.l{left:-.5rem}.arrow.r{right:-.5rem}
+/* music sections */
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;align-items:start}
+@media(max-width:850px){.cols{grid-template-columns:1fr}}
+.song{display:flex;align-items:center;gap:.7rem;padding:.6rem;margin-bottom:.6rem;background:#fff;border-radius:16px;
+  box-shadow:0 2px 8px #3d2a6320;cursor:pointer;border:2px solid transparent}
+.song.active{border-color:var(--purple);background:var(--beige)}
+.album{width:48px;height:48px;border-radius:10px;display:grid;place-items:center;font-size:1.5rem;flex:none}
+.info{flex:1;display:flex;flex-direction:column;line-height:1.2}.info span,.time{font-size:.8rem;color:#7a6a99}
+.play{background:var(--purple);color:#fff;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;text-decoration:none;font-size:.8rem}
+/* scrapbook card */
+.card{background:#fffdf7;padding:1.6rem 1.2rem 1.2rem;border-radius:6px;box-shadow:0 6px 14px #3d2a6330;position:relative;
+  transform:rotate(-1deg);background-image:linear-gradient(#e9e0f0 1px,transparent 1px);background-size:100% 28px}
+.card::before{content:"";position:absolute;top:-12px;left:50%;width:90px;height:24px;transform:translateX(-50%) rotate(3deg);background:#f4b6c9aa}
+.card .st{position:absolute;right:-8px;bottom:-14px;font-size:2rem}
+label{display:block;font-weight:700;font-size:.85rem;margin-top:.6rem}
+input,textarea{width:100%;padding:.5rem;border:2px dashed var(--purple);border-radius:8px;background:#fff9;font:inherit}
+.credits{margin-top:1.4rem;font-size:.85rem;background:var(--beige);padding:.7rem;border-radius:10px}
+.note{background:#fff;border-left:5px solid var(--pink);padding:.6rem .8rem;margin-bottom:.7rem;border-radius:6px;box-shadow:0 2px 6px #3d2a6320}
+.note p{margin:.2rem 0;font-family:'Patrick Hand';font-size:1.1rem}
+footer{background:var(--purple);color:var(--beige);text-align:center;padding:1.5rem}
+footer b{font-family:'Caveat Brush';font-size:1.6rem;font-weight:400}
+footer p{margin:.2rem}
+
+/* ===== v2: mas maraming stickers ===== */
+.hero{padding:3.5rem 1.5rem 3rem;min-height:70vh;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.hero>*:not(.sticker):not(.badge){position:relative;z-index:1}
+.kicker{font-family:'Patrick Hand';font-size:1.5rem;margin:0}
+.quote{font-family:'Caveat Brush';font-size:1.8rem;color:var(--purple);margin:.6rem 0 1.2rem}
+.tile{width:3.6rem;height:3.6rem}
+@media(max-width:600px){.tile{width:2.2rem;height:2.2rem;font-size:1.2rem}.sticker{font-size:1.8rem}.badge{display:none}}
+.sticker{transform:rotate(var(--r,0deg));filter:drop-shadow(2px 3px 0 #fff) drop-shadow(0 2px 4px #3d2a6340);z-index:0;pointer-events:none}
+.sticker.small{font-size:1.8rem;position:absolute}
+@keyframes float{50%{transform:translateY(-10px) rotate(calc(var(--r,0deg) + 8deg))}}
+.badge{position:absolute;background:var(--purple);color:var(--off);font:700 1rem 'Sulphur Point';padding:.3rem .9rem;border-radius:30px;
+  border:3px dashed var(--beige);transform:rotate(var(--r,0deg));box-shadow:0 3px 0 var(--dark)}
+.badge.pink{background:var(--pink);color:var(--dark);border-color:#fff}
+.tape-row{background:var(--purple);color:#fff;padding:.5rem;text-align:center;white-space:nowrap;overflow:hidden;font-size:1.3rem;letter-spacing:.8rem;
+  border-top:4px dotted var(--beige);border-bottom:4px dotted var(--beige)}
+.paper{position:relative;background:#fffdf7;padding:2rem 1.5rem;border-radius:6px;box-shadow:0 6px 14px #3d2a6330;transform:rotate(-1deg);
+  background-image:linear-gradient(#e9e0f0 1px,transparent 1px);background-size:100% 28px}
+.tape{position:absolute;top:-12px;left:50%;width:100px;height:24px;transform:translateX(-50%) rotate(-3deg);background:#f4b6c9aa}
+.deco-sec{position:relative}
+footer{position:relative}
+.card .st2{position:absolute;left:-10px;top:-6px;font-size:1.6rem;transform:rotate(-12deg)}
+.card small{display:block;font-size:.75rem;color:#7a6a99}
+#photoPreview img{width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-top:.4rem;border:3px solid #fff;box-shadow:0 2px 6px #3d2a6340}
+#photoPreview button{margin-top:.3rem;background:none;border:0;color:var(--purple);text-decoration:underline;cursor:pointer;font:inherit}
+.slide{cursor:pointer;transition:transform .15s}
+.slide:hover{transform:translateY(-4px) rotate(-1deg)}
+.slide::after{content:"basahin ▸";position:absolute;top:10px;right:10px;background:var(--yellow);color:var(--dark);font-size:.7rem;font-weight:700;padding:.1rem .6rem;border-radius:20px}
+/* modal para sa buong entry */
+.modal{position:fixed;inset:0;background:#3d2a63cc;display:grid;place-items:center;padding:1rem;z-index:50;overflow:auto}
+.modal[hidden]{display:none}
+.modal-card{background:#fffdf7;max-width:460px;width:100%;border-radius:8px;overflow:hidden;position:relative;box-shadow:0 10px 30px #0006}
+.modal-top{height:180px;background-size:cover;background-position:center;display:grid;place-items:center;font-size:5rem}
+.modal-body{padding:1.2rem;position:relative}
+.modal-body .tape{top:-12px}
+.modal-body p{font-family:'Patrick Hand';font-size:1.3rem;margin:.5rem 0}
+.modal-body .btn{font-size:.85rem;padding:.5rem 1rem;margin:.2rem .2rem 0 0}
+.modal-x{position:absolute;top:8px;right:8px;background:var(--yellow);border:0;border-radius:50%;width:2.2rem;height:2.2rem;cursor:pointer;font-size:1rem;z-index:2}
+
+/* player */
+#player{margin-top:.8rem;background:var(--purple);padding:.6rem;border-radius:16px;border:3px dashed var(--beige)}
+#player iframe{border-radius:12px;display:block}
+#player small{color:var(--beige);display:block;margin-top:.3rem}#player small a{color:var(--yellow)}
+button.play{border:0;cursor:pointer;font:inherit;font-size:.8rem}
+
+#songSearch{margin-bottom:.5rem;border-style:solid;border-radius:30px;padding:.6rem 1rem}
+#spSearch{display:inline-block;margin-bottom:.5rem;font-size:.85rem}
+.addsong{margin-top:.8rem;background:var(--beige);border-radius:12px;padding:.6rem .8rem}
+.addsong summary{cursor:pointer;font-weight:700}
+.addsong input{margin-top:.4rem}.addsong .btn{margin-top:.5rem;font-size:.85rem}
