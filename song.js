@@ -19,7 +19,7 @@ function safeBg(url) {
 // background: photo ng user, o kung wala, album color ng kanta
 function bgStyle(e, song) {
   const photo = safeBg(e.bg);
-  return photo ? `background-image:url("${photo}")` : (safeBg(song.cover) ? `background-image:url("${safeBg(song.cover)}")` : `background:${song.color}`);
+  return photo ? `background-image:url('${photo}')` : (safeBg(song.cover) ? `background-image:url('${safeBg(song.cover)}')` : `background:${song.color}`);
 }
 
 // ---------- 1. PREVIEW (slide cards, clickable) ----------
