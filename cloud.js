@@ -1,81 +1,203 @@
-// cloud.js - online database ng LetLiriko gamit ang Firebase Firestore (libre, walang server na kailangan).
-// Kapag wala pang config sa baba, localStorage lang muna ang gagamitin ng site (gaya ng dati).
-//
-// SETUP (mga 10 minutes):
-// 1. console.firebase.google.com > Add project > (i-off ang Analytics okay lang)
-// 2. Build > Firestore Database > Create database (production mode)
-// 3. Project settings (gear icon) > Your apps > Web (</>) > Register app > kopyahin ang firebaseConfig sa baba
-// 4. Firestore > Rules > i-paste ang rules na nasa dulo ng file na ito > Publish
-// 5. Buksan ang site gamit ang Live Server (hindi double-click sa file), kasi type="module" ito.
+// ==========================================
+// LETLIRIKO - SUPABASE CLOUD DATABASE
+// ==========================================
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { createClient } from
+  "https://esm.sh/@supabase/supabase-js@2";
 
-const firebaseConfig = {
-  apiKey: "PASTE_HERE",
-  authDomain: "PASTE_HERE",
-  projectId: "PASTE_HERE",
-  storageBucket: "PASTE_HERE",
-  messagingSenderId: "PASTE_HERE",
-  appId: "PASTE_HERE"
+// 1. PASTE YOUR SUPABASE CREDENTIALS HERE
+const SUPABASE_URL = "https://cbgvihrgbuwfqocuvdod.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wMe9p0nEk8_Y78hYMD8O2w_ZIEY0bcl";
+
+// 2. STORAGE BUCKET NAME
+const STORAGE_BUCKET = "entry-backgrounds";
+
+// 3. CONNECT TO SUPABASE
+const supabase = createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+// Make Supabase available for other scripts
+window.supabaseClient = supabase;
+
+
+// ==========================================
+// CLOUD ENTRIES
+// ==========================================
+
+async function getCloudEntries() {
+  const { data, error } = await supabase
+    .from("entries")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error loading entries:", error);
+    throw error;
+  }
+
+  return data || [];
+}
+
+
+// ==========================================
+// ADD A NEW ENTRY
+// ==========================================
+
+async function addCloudEntry(entry) {
+  let backgroundUrl = entry.bg || null;
+
+  // Upload background photo if it is a data URL
+  if (
+    backgroundUrl &&
+    backgroundUrl.startsWith("data:")
+  ) {
+    const response = await fetch(backgroundUrl);
+    const blob = await response.blob();
+
+    const extension =
+      blob.type.split("/")[1] || "jpg";
+
+    const fileName =
+      `${crypto.randomUUID()}.${extension}`;
+
+    const { error: uploadError } = await supabase
+      .storage
+      .from(STORAGE_BUCKET)
+      .upload(fileName, blob, {
+        contentType: blob.type,
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error("Photo upload failed:", uploadError);
+      throw uploadError;
+    }
+
+    const { data: publicData } = supabase
+      .storage
+      .from(STORAGE_BUCKET)
+      .getPublicUrl(fileName);
+
+    backgroundUrl = publicData.publicUrl;
+  }
+
+  const { data, error } = await supabase
+    .from("entries")
+    .insert({
+      song_id: String(entry.songId),
+      title: entry.title || "",
+      meaning: entry.meaning || "",
+      author_name: entry.from || "Anonymous",
+      bg_url: backgroundUrl
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Entry submission failed:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+
+// ==========================================
+// LOAD CUSTOM SONGS
+// ==========================================
+
+async function getCloudSongs() {
+  const { data, error } = await supabase
+    .from("songs")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error loading songs:", error);
+    throw error;
+  }
+
+  return data || [];
+}
+
+
+// ==========================================
+// ADD A CUSTOM SONG
+// ==========================================
+
+async function addCloudSong(song) {
+  const { data, error } = await supabase
+    .from("songs")
+    .insert({
+      id: String(song.id),
+      title: song.title,
+      artist: song.artist || ""
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Song submission failed:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+
+// ==========================================
+// REALTIME UPDATES
+// ==========================================
+
+function listenForEntryUpdates(callback) {
+  return supabase
+    .channel("public-entries")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "entries"
+      },
+      callback
+    )
+    .subscribe();
+}
+
+
+// ==========================================
+// CHECK CONNECTION
+// ==========================================
+
+async function testSupabaseConnection() {
+  const { error } = await supabase
+    .from("entries")
+    .select("id")
+    .limit(1);
+
+  if (error) {
+    console.error("Supabase connection failed:", error);
+    return false;
+  }
+
+  console.log("LetLiriko is connected to Supabase!");
+  return true;
+}
+
+
+// ==========================================
+// EXPORT FUNCTIONS
+// ==========================================
+
+window.LetLirikoCloud = {
+  getCloudEntries,
+  addCloudEntry,
+  getCloudSongs,
+  addCloudSong,
+  listenForEntryUpdates,
+  testSupabaseConnection
 };
 
-if (firebaseConfig.apiKey === "PASTE_HERE") {
-  console.warn("cloud.js: wala pang Firebase config, localStorage muna ang gamit.");
-} else {
-  const db = getFirestore(initializeApp(firebaseConfig));
-  let cloudEntries = [];
-
-  // entries: ang fake samples ay laging nandiyan, tapos ang totoong posts mula sa Firestore
-  DB.all = () => cloudEntries.concat(SAMPLE_ENTRIES);
-  DB.add = entry => {
-    entry.id = Date.now();            // number, para gumana ang openEntry(id)
-    addDoc(collection(db, "entries"), entry).catch(err => {
-      console.error(err);
-      alert("Hindi na-save online. Subukan ulit.");
-    });
-    return entry;
-  };
-
-  // songs na dinagdag ng users
-  DB.addSong = song => {
-    SONGS.push(song);                 // lalabas agad sa list
-    addDoc(collection(db, "songs"), song).catch(console.error);
-  };
-
-  // live updates: kapag may nag-post, lalabas agad sa lahat
-  onSnapshot(collection(db, "entries"), snap => {
-    cloudEntries = snap.docs.map(d => d.data()).sort((a, b) => b.id - a.id);
-    renderPreview(); renderEntries();
-  });
-  onSnapshot(collection(db, "songs"), snap => {
-    let added = false;
-    snap.docs.forEach(d => {
-      const s = d.data();
-      if (!SONGS.some(x => x.id === s.id || x.spotifyId === s.spotifyId)) { SONGS.push(s); added = true; }
-    });
-    if (added) { renderSongs(); renderPreview(); renderEntries(); }
-  });
-}
-
-/* FIRESTORE RULES (i-paste sa Firebase console > Firestore > Rules):
-
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /entries/{id} {
-      allow read: if true;
-      allow create: if request.resource.data.meaning is string
-                    && request.resource.data.meaning.size() <= 400
-                    && request.resource.data.from is string
-                    && request.resource.data.from.size() <= 25;
-      allow update, delete: if false;
-    }
-    match /songs/{id} {
-      allow read: if true;
-      allow create: if request.resource.data.spotifyId is string;
-      allow update, delete: if false;
-    }
-  }
-}
-*/
+console.log("LetLiriko cloud.js loaded!");
