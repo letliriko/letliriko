@@ -24,7 +24,7 @@ function bgStyle(e, song) {
 
 // ---------- 1. PREVIEW (slide cards, clickable) ----------
 function renderPreview() {
-  $("slides").innerHTML = DB.all().map(e => {
+  $("slides").innerHTML = DB.all().filter(e => findSong(e.songId)).map(e => {
     const song = findSong(e.songId);
     return `<article class="slide" tabindex="0" role="button" aria-label="Basahin ang entry ni ${esc(e.from)}"
       style="${bgStyle(e, song)}" onclick="openEntry(${e.id})"
@@ -49,6 +49,7 @@ function openEntry(id) {
   const e = DB.all().find(x => x.id === id);
   if (!e) return;
   const s = findSong(e.songId);
+  if (!s) return;
   const photo = safeBg(e.bg);
   $("modalCard").innerHTML = `
     <button class="modal-x" onclick="closeModal()" aria-label="Isara">✕</button>
@@ -95,9 +96,12 @@ function renderCredits() {
   const s = findSong(currentSong);
   $("credits").innerHTML = `Kanta: <b>${s.title}</b> by ${s.artist} ${s.album ? `(${s.album})` : ""}.
     Pakinggan sa <a href="${s.spotify}" target="_blank">Spotify</a>.`;
-  $("player").innerHTML = `<iframe title="Spotify player" src="https://open.spotify.com/embed/track/${s.spotifyId}?theme=0"
+  $("player").innerHTML = s.spotifyId
+    ? `<iframe title="Spotify player" src="https://open.spotify.com/embed/track/${s.spotifyId}?theme=0"
     width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen" loading="lazy"></iframe>
-    <small>Hindi mag-play? <a href="${s.spotify}" target="_blank">Buksan sa Spotify</a></small>`;
+    <small>Hindi mag-play? <a href="${s.spotify}" target="_blank">Buksan sa Spotify</a></small>`
+    : `${/^https:\/\//.test(s.preview || "") ? `<audio controls preload="none" src="${s.preview}" style="width:100%"></audio><small>30-second preview lang ito.</small>` : ""}
+    <small><a href="${s.spotify}" target="_blank">Pakinggan ang buong kanta sa Spotify</a></small>`;
   $("formSong").textContent = `${s.title} - ${s.artist}`;
 }
 function pickSong(id) {
