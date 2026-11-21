@@ -13,7 +13,7 @@ function esc(t) {
 function shorten(t, n) { return t.length > n ? t.slice(0, n).trim() + "..." : t; }
 // photo lang na safe ang papayagan
 function safeBg(url) {
-  if (!url || !/^(data:image\/|https?:\/\/)/.test(url)) return "";
+  if (!url || !/^(data:image\/|https?:\/\/|images\/)/.test(url)) return "";
   return url.replace(/["'()\s]/g, "");
 }
 // background: photo ng user, o kung wala, album color ng kanta
@@ -79,7 +79,7 @@ function renderSongs() {
   $("songList").innerHTML = !shown.length ? "<p>Walang nakita. Subukan ang 'Hanapin sa Spotify' sa baba, tapos idagdag dito 👇</p>" : shown.map(s => `
     <div class="song ${s.id === currentSong ? "active" : ""}" onclick="pickSong('${s.id}')">
       <div class="album" style="${safeBg(s.cover) ? `background:url('${safeBg(s.cover)}') center/cover` : `background:${s.color}`}">${safeBg(s.cover) ? "" : s.emoji}</div>
-      <div class="info"><b>${s.title}</b><span>${s.artist}</span></div>
+      <div class="info"><b>${esc(s.title)}</b><span>${esc(s.artist)}</span></div>
       <span class="time">${s.time}</span>
       <button class="play" onclick="event.stopPropagation();pickSong('${s.id}');$('player').scrollIntoView({behavior:'smooth',block:'center'})" title="I-play dito" aria-label="I-play ang ${s.title}">▶</button>
     </div>`).join("");
@@ -112,11 +112,11 @@ function readPhoto(file) {
   reader.onload = () => {
     const img = new Image();
     img.onload = () => {
-      const scale = Math.min(1, 700 / img.width);
+      const scale = Math.min(1, 600 / img.width);
       const c = document.createElement("canvas");
       c.width = img.width * scale; c.height = img.height * scale;
       c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-      pendingPhoto = c.toDataURL("image/jpeg", 0.7);
+      pendingPhoto = c.toDataURL("image/jpeg", 0.6);
       showPhoto();
     };
     img.src = reader.result;
@@ -170,6 +170,7 @@ $("songForm").addEventListener("submit", addSong);
 
 pickSong(currentSong);
 renderPreview();
+loadCovers(() => { renderPreview(); renderSongs(); renderEntries(); });
 $("entryForm").addEventListener("submit", saveEntry);
 $("photo").addEventListener("change", e => { if (e.target.files[0]) readPhoto(e.target.files[0]); });
 setInterval(() => { if ($("modal").hidden) slide(1); }, 5000);
