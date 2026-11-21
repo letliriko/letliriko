@@ -27,8 +27,8 @@ function renderPreview() {
   $("slides").innerHTML = DB.all().filter(e => findSong(e.songId)).map(e => {
     const song = findSong(e.songId);
     return `<article class="slide" tabindex="0" role="button" aria-label="Basahin ang entry ni ${esc(e.from)}"
-      style="${bgStyle(e, song)}" onclick="openEntry(${e.id})"
-      onkeydown="if(event.key==='Enter')openEntry(${e.id})">
+      style="${bgStyle(e, song)}" onclick="openEntry('${String(e.id)}')"
+      onkeydown="if(event.key==='Enter')openEntry('${String(e.id)}')">
       ${safeBg(e.bg) || safeBg(song.cover) ? "" : `<span class="slide-emoji">${song.emoji}</span>`}
       <div class="slide-text">
         <small>${esc(e.from)}</small>
@@ -46,7 +46,7 @@ function slide(dir) {
 
 // ---------- popup ng buong entry ----------
 function openEntry(id) {
-  const e = DB.all().find(x => x.id === id);
+  const e = DB.all().find(x => String(x.id) === String(id));
   if (!e) return;
   const s = findSong(e.songId);
   if (!s) return;
@@ -88,7 +88,7 @@ function renderSongs() {
 function renderEntries() {
   const list = DB.forSong(currentSong);
   $("entryList").innerHTML = list.length
-    ? list.map(e => `<div class="note" style="cursor:pointer" onclick="openEntry(${e.id})"><b>${esc(e.title || "Walang title")}</b>
+    ? list.map(e => `<div class="note" style="cursor:pointer" onclick="openEntry('${String(e.id)}')"><b>${esc(e.title || "Walang title")}</b>
         <p>${esc(shorten(e.meaning, 90))}</p><small>— ${esc(e.from)}</small></div>`).join("")
     : "<p>Wala pang entry dito. Ikaw na ang una! 💜</p>";
 }
@@ -133,13 +133,13 @@ function showPhoto() {
 }
 function clearPhoto() { pendingPhoto = ""; $("photo").value = ""; showPhoto(); }
 
-function saveEntry(ev) {
+async function saveEntry(ev) {
   ev.preventDefault();
   const meaning = $("meaning").value.trim();
   const from = $("from").value.trim();
   if (!meaning || !from) { $("msg").textContent = "Lagay ka muna ng kwento at codename ha."; return; }
   try {
-    DB.add({ songId: currentSong, title: $("title").value.trim(), meaning, from, bg: pendingPhoto });
+    await DB.add({ songId: currentSong, title: $("title").value.trim(), meaning, from, bg: pendingPhoto });
   } catch (err) {
     $("msg").textContent = "Puno na ang storage. Subukan ang mas maliit na photo.";
     return;
@@ -164,7 +164,7 @@ async function addSong(ev) {
   if (!title) { $("songMsg").textContent = "Ilagay ang title ng kanta."; return; }
   const song = { id, title, artist: $("songArtist").value.trim() || "OPM", album: "", time: "", color: "#7b5ea7", emoji: "🎵",
     spotifyId: m[1], spotify: "https://open.spotify.com/track/" + m[1], cover, custom: true };
-  DB.addSong(song);
+  try { await DB.addSong(song); } catch (err) { $("songMsg").textContent = "Hindi na-save online. Pakisubukan ulit."; return; }
   ev.target.reset(); songQuery = ""; $("songSearch").value = "";
   $("songMsg").textContent = "Nadagdag na! 🎶";
   pickSong(id);
