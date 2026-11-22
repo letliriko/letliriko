@@ -8,50 +8,6 @@ const $ = id => document.getElementById(id);
 
 // Combine shared online entries with the original local entries.
 const cloudEntries = [];
-// Shared custom songs from Supabase
-const cloudSongs = [];
-
-function fromCloudSong(row) {
-  return {
-    id: String(row.id),
-    title: row.title || "",
-    artist: row.artist || "OPM",
-    album: "",
-    time: "",
-    color: "#7b5ea7",
-    emoji: "🎵",
-    spotifyId: String(row.id).replace(/^c/, ""),
-    spotify: "https://open.spotify.com/track/" +
-      String(row.id).replace(/^c/, ""),
-    cover: "",
-    custom: true
-  };
-}
-
-async function loadCloudSongs() {
-  if (!window.LetLirikoCloud) return;
-
-  try {
-    const rows = await window.LetLirikoCloud.getCloudSongs();
-
-    cloudSongs.splice(
-      0,
-      cloudSongs.length,
-      ...(rows || []).map(fromCloudSong)
-    );
-
-    cloudSongs.forEach(song => {
-      if (!SONGS.some(existing => String(existing.id) === String(song.id))) {
-        SONGS.push(song);
-      }
-    });
-
-    renderSongs();
-    renderEntries();
-  } catch (error) {
-    console.error("Could not load shared songs:", error);
-  }
-}
 const localAllEntries = DB.all.bind(DB);
 
 DB.all = function () {
@@ -424,29 +380,15 @@ async function addSong(ev) {
     custom: true
   };
 
-try {
-  if (!window.LetLirikoCloud ||
-      typeof window.LetLirikoCloud.addCloudSong !== "function") {
-    throw new Error("Supabase connection is not ready.");
-  }
-
-  await window.LetLirikoCloud.addCloudSong(song);
-
   DB.addSong(song);
 
   ev.target.reset();
   songQuery = "";
   $("songSearch").value = "";
 
-  $("songMsg").textContent = "Nadagdag na at na-save online! 🎶";
+  $("songMsg").textContent = "Nadagdag na! 🎶";
 
   pickSong(id);
-
-} catch (error) {
-  console.error("Song save failed:", error);
-
-  $("songMsg").textContent =
-    "Hindi na-save online: " + (error.message || "May error sa Supabase.");
 }
 
 $("songSearch").addEventListener("input", e => {
@@ -477,4 +419,3 @@ setInterval(() => {
 
 // Load shared entries after the page and cloud script initialize.
 window.addEventListener("load", loadCloudEntries);
-window.addEventListener("load", loadCloudSongs);
