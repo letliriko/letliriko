@@ -477,3 +477,4 @@ setInterval(() => {
 
 // Load shared entries after the page and cloud script initialize.
 window.addEventListener("load", loadCloudEntries);
+window.addEventListener("load", loadCloudSongs);
