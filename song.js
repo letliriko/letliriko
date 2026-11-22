@@ -424,15 +424,29 @@ async function addSong(ev) {
     custom: true
   };
 
+try {
+  if (!window.LetLirikoCloud ||
+      typeof window.LetLirikoCloud.addCloudSong !== "function") {
+    throw new Error("Supabase connection is not ready.");
+  }
+
+  await window.LetLirikoCloud.addCloudSong(song);
+
   DB.addSong(song);
 
   ev.target.reset();
   songQuery = "";
   $("songSearch").value = "";
 
-  $("songMsg").textContent = "Nadagdag na! 🎶";
+  $("songMsg").textContent = "Nadagdag na at na-save online! 🎶";
 
   pickSong(id);
+
+} catch (error) {
+  console.error("Song save failed:", error);
+
+  $("songMsg").textContent =
+    "Hindi na-save online: " + (error.message || "May error sa Supabase.");
 }
 
 $("songSearch").addEventListener("input", e => {
