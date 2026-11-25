@@ -1,5 +1,5 @@
-// entries.js - "database" ng Letliriko (nasa browser, walang login)
-// Sample lang ang mga ito. Pwede kang magdagdag ng kanta sa SONGS.
+// entries.js - LetLiriko song catalog and local sample database.
+// These are sample songs. Add more songs to the SONGS array when needed.
 const SONGS = [
   { id: "tadhana", title: "Tadhana", artist: "Up Dharma Down", album: "Capacities", time: "3:42",
     color: "#7b5ea7", emoji: "🌙", spotifyId: "6FIEuf1JIzmCtach0gXpeG" },
@@ -8,13 +8,13 @@ const SONGS = [
   { id: "pare-ko", title: "Pare Ko", artist: "Eraserheads", album: "Ultraelectromagneticpop!", time: "5:24",
     color: "#5b4a8a", emoji: "🎸", spotifyId: "7uuirrtCr8O8fz7kQS6VUR" }
 ];
-// para sa bagong kanta: Spotify > Share > Copy link, tapos kunin ang code sa pagitan ng /track/ at ?
-// ---------- SLUG / EMOJI / KULAY ----------
+// To add a song: copy its Spotify link and get the ID between /track/ and the question mark.
+// ---------- SLUGS / EMOJIS / COLORS ----------
 const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const EMOJIS = ["🎵","🌙","⭐","🌸","🎧","💌","🦋","🍓","🎸","💜"];
 const COLORS = ["#7b5ea7","#c9a27c","#5b4a8a","#d98ca8","#6b8fb5","#8aa68a"];
-// ---------- MGA KANTANG MAY SPOTIFY LINK ----------
-// [id, title, artist, album, spotifyId, cover]. Ang cover ay ang album photo ni Spotify: ito ang default background ng entry na walang photo.
+// ---------- SONGS WITH SPOTIFY LINKS ----------
+// [id, title, artist, album, spotifyId, cover]. The album cover is the default entry background when no photo is uploaded.
 const IMG = "https://i.scdn.co/image/ab67616d0000b273";
 const LINKED = [
   ["huwag-na-huwag-mong-sasabihin","Huwag Na Huwag Mong Sasabihin","Kitchie Nadal","Kitchie Nadal","4mOjjXKDOR1sel6APULUaN","4699830bfdf6e043cda2d294"],
@@ -66,20 +66,20 @@ const LINKED = [
 ];
 LINKED.forEach(([id, title, artist, album, spotifyId, c], i) => SONGS.push({ id, title, artist, album, time: "",
   color: COLORS[i % COLORS.length], emoji: EMOJIS[i % EMOJIS.length], spotifyId, cover: IMG + c }));
-// Ang Kathang Isip (taas) ay nasa listahan na. Ang Tadhana at Pare Ko ay kukunan ng album photo ni Spotify kusa (loadCovers).
+// Kathang Isip is already listed above. Tadhana and Pare Ko will load their album artwork through loadCovers.
 SONGS.forEach(s => s.spotify = s.spotifyId ? "https://open.spotify.com/track/" + s.spotifyId
   : "https://open.spotify.com/search/" + encodeURIComponent(s.title + " " + s.artist));
 
 // ---------- ALBUM COVERS ----------
-// Kusang kinukuha ang album photo sa Spotify (oEmbed, walang API key) at sine-save sa browser.
-// Kapag may s.cover na ang kanta, ito ang magiging default background ng entry na walang photo.
+// Fetch album artwork from Spotify oEmbed without an API key and cache it in the browser.
+// A song cover is used as the default background when an entry has no uploaded photo.
 const COVER_KEY = "letliriko_covers2";
 let coverCache = {};
 try { coverCache = JSON.parse(localStorage.getItem(COVER_KEY) || "{}"); } catch (e) {}
 SONGS.forEach(s => { const c = coverCache[s.id]; if (c) { s.cover = s.cover || c.cover; s.preview = c.preview; } });
 
-// Spotify oEmbed para sa may spotifyId; iTunes Search (libre, walang API key) para sa iba. Isa-isa para hindi ma-rate limit,
-// at naka-save sa browser kaya mabilis na sa susunod na bukas.
+// Use Spotify oEmbed for songs with a Spotify ID and iTunes Search for other songs. Process requests one at a time to avoid rate limits,
+// and cache results in the browser for faster loading on future visits.
 async function loadCovers(done) {
   for (const s of SONGS) {
     if (coverCache[s.id] || (s.cover && s.spotifyId)) continue;
@@ -104,9 +104,9 @@ async function loadCovers(done) {
   }
 }
 
-// ---------- AESTHETIC BACKGROUNDS (para sa fake entries) ----------
-// Gumagawa ng pastel na gradient image. Pwede mo ring palitan ng sarili mong photo:
-// ilagay sa folder na "images/" tapos bg: "images/pangalan.jpg"
+// ---------- AESTHETIC BACKGROUNDS FOR SAMPLE ENTRIES ----------
+// Generate a pastel gradient image. You can replace it with your own photo:
+// place it in the "images/" folder and set bg to "images/filename.jpg".
 function bgArt(c1, c2, c3) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 440"><defs>` +
     `<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs>` +
@@ -124,7 +124,7 @@ const ART = {
   rose:   bgArt("#f9c5d1", "#fbf8f3", "#c9a7eb")
 };
 
-// Sample users (codename) at entries nila. Ang bg: "" = album photo ng kanta ang gagamitin.
+// Sample authors and entries. An empty bg value uses the song album cover.
 const SAMPLE_ENTRIES = [
   { id: 1, songId: "tadhana", title: "Para sa kaibigang lumayo", from: "Kuya Mochi", bg: ART.dusk,
     meaning: "Tuwing naririnig ko 'to, naaalala ko yung gabi na nag-usap tayo hanggang madaling araw. Miss na kita." },
@@ -152,7 +152,7 @@ const SAMPLE_ENTRIES = [
     meaning: "Paalala sa sarili: okay lang magpahinga. Hindi mo kailangang maging malakas palagi." }
 ];
 
-// 30 scripted entries (isa bawat bagong kanta). Bawat ikatlo ay walang photo, kaya album photo ng kanta ang lalabas.
+// Scripted sample entries for the song catalog. Some entries omit photos to use the album cover.
 const ENTRY_KEYS = Object.keys(ART);
 [
   ["Akap","Mitch.R","Hindi ko pa rin kayang bitawan","Ilang taon na pero tuwing tutugtog 'to, parang bumabalik lahat. Hindi ko pa rin alam kung paano bumitaw."],
@@ -189,7 +189,7 @@ const ENTRY_KEYS = Object.keys(ART);
   id: 13 + i, songId: slug(t), title, from, meaning, bg: i % 3 === 1 ? "" : ART[ENTRY_KEYS[i % ENTRY_KEYS.length]]
 }));
 
-// Dagdag na realistic na entries para sa mga kantang may Spotify link
+// Additional sample entries for songs with Spotify links.
 [
   ["burnout","Pagod na Nurse","Duty ng 12 hours","Pagkatapos ng double shift, uupo muna ako sa jeep at ito ang ipapatugtog ko. Wala na akong lakas mag-chat o mag-scroll, kantang kasing-pagod ko lang ang kailangan ko."],
   ["totoong-tayo","Mhie_ng_Sampaloc","","Dalawang taon na kami pero ngayon lang kami naging totoo sa isa't isa. Walang filter, walang pagpapanggap. Pinatugtog ko 'to noong sinabi niyang mahal niya pa rin ako kahit nakita na niya ang lahat ng pangit sa akin."],
@@ -218,7 +218,7 @@ const ENTRY_KEYS = Object.keys(ART);
 const KEY = "letliriko_entries";
 
 const DB = {
-  // kunin lahat ng entries (kung wala pa, ilagay muna ang samples)
+  // Return saved entries, or initialize local storage with the sample entries.
   all() {
     try {
       const saved = JSON.parse(localStorage.getItem(KEY));
@@ -240,7 +240,7 @@ const DB = {
 
 function findSong(id) { return SONGS.find(s => s.id === id); }
 
-// mga kantang dinagdag ng users (saved sa browser; kung may cloud.js, saved online)
+// User-added songs are saved in the browser; cloud integration can also store them online.
 const SONG_KEY = "letliriko_songs";
 try { JSON.parse(localStorage.getItem(SONG_KEY) || "[]").forEach(s => SONGS.push(s)); } catch (err) {}
 DB.addSong = function (s) {

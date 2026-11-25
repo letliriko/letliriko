@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>LetLiriko Test</title>
+<style>body{font-family:sans-serif;max-width:600px;margin:2rem auto}.ok{color:green}.bad{color:red}</style></head>
+<body>
+<h1>LetLiriko - Test Page</h1>
+<p>Checks kung gumagana ang songs at database. <a href="messages.html">Back to Messages</a></p>
+<ul id="results"></ul>
+<button onclick="DB.reset();location.reload()">Reset sample data</button>
+<script src="entries.js"></script>
+<script>
+function check(name, pass) {
+  const li = document.createElement("li");
+  li.className = pass ? "ok" : "bad";
+  li.textContent = (pass ? "PASS: " : "FAIL: ") + name;
+  document.getElementById("results").appendChild(li);
+}
+check("May at least 3 OPM songs", SONGS.length >= 3);
+check("May sample entries", DB.all().length >= 1);
+check("Bawat song may Spotify link", SONGS.every(s => s.spotify.startsWith("https://")));
+check("Bawat entry may kantang nage-exist", DB.all().every(e => findSong(e.songId)));
+const before = DB.all().length;
+DB.add({ songId: SONGS[0].id, title: "test", meaning: "test", from: "tester", bg: "" });
+check("Nakaka-add ng bagong entry", DB.all().length === before + 1);
+check("Nakukuha ang entries per song", DB.forSong(SONGS[0].id).length >= 1);
+// tanggalin ang test entry
+localStorage.setItem(KEY, JSON.stringify(DB.all().filter(e => e.from !== "tester")));
+</script></body></html>

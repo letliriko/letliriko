@@ -4,7 +4,15 @@
 let currentSong = SONGS[0].id;
 let pendingPhoto = "";
 let songQuery = "";
+let currentUser = null;
 const $ = id => document.getElementById(id);
+const notify = (message, type = "info") => window.showToast ? window.showToast(message, type) : window.alert(message);
+function formatEntryDate(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("fil-PH", { year: "numeric", month: "long", day: "numeric" }).format(date);
+}
 
 // Combine shared online entries with the original local entries.
 const cloudEntries = [];
@@ -25,7 +33,9 @@ function fromCloudEntry(row) {
     title: row.title || "",
     meaning: row.meaning || "",
     from: row.author_name || "Anonymous",
-    bg: row.bg_url || ""
+    bg: row.bg_url || "",
+    created_at: row.created_at || null,
+    user_id: row.user_id || null
   };
 }
 
@@ -33,6 +43,7 @@ async function loadCloudEntries() {
   if (!window.LetLirikoCloud) return;
 
   try {
+    currentUser = await window.LetLirikoCloud.getCurrentUser();
     const rows = await window.LetLirikoCloud.getCloudEntries();
     cloudEntries.splice(
       0,
@@ -75,24 +86,17 @@ function bgStyle(e, song) {
 
 // ---------- 1. PREVIEW ----------
 function renderPreview() {
-  $("slides").innerHTML = DB.all()
-    .filter(e => findSong(e.songId))
-    .map(e => {
-      const song = findSong(e.songId);
-
-      return `<article class="slide" tabindex="0" role="button"
-        aria-label="Basahin ang entry ni ${esc(e.from)}"
-        style="${bgStyle(e, song)}"
-        onclick="openEntry(${e.id})"
-        onkeydown="if(event.key==='Enter')openEntry(${e.id})">
-        ${safeBg(e.bg) || safeBg(song.cover) ? "" : `<span class="slide-emoji">${song.emoji}</span>`}
-        <div class="slide-text">
-          <small>${esc(e.from)}</small>
-          <h3>${esc(e.title || song.title)}</h3>
-          <p>${esc(shorten(e.meaning, 70))}</p>
-        </div>
-      </article>`;
-    }).join("");
+  $("slides").innerHTML = DB.all().filter(e => findSong(e.songId)).map(e => {
+    const song = findSong(e.songId);
+    const date = formatEntryDate(e.created_at);
+    return `<article class="slide" tabindex="0" role="button" aria-label="Read entry by ${esc(e.from)}"
+      style="${bgStyle(e, song)}" onclick='openEntry(${JSON.stringify(e.id)})'
+      onkeydown='if(event.key==="Enter"||event.key===" " ){event.preventDefault();openEntry(${JSON.stringify(e.id)})}'>
+      ${safeBg(e.bg) || safeBg(song.cover) ? "" : `<span class="slide-emoji">${song.emoji}</span>`}
+      <div class="slide-text"><small>${esc(e.from)}${date ? ` · ${esc(date)}` : ""}</small>
+      <h3>${esc(e.title || song.title)}</h3><p>${esc(shorten(e.meaning, 70))}</p></div>
+    </article>`;
+  }).join("");
 }
 
 function slide(dir) {
@@ -110,31 +114,42 @@ function slide(dir) {
 
 // ---------- ENTRY POPUP ----------
 function openEntry(id) {
-  const e = DB.all().find(x => x.id === id);
+  const e = DB.all().find(x => String(x.id) === String(id));
   if (!e) return;
-
-  const s = findSong(e.songId);
-  if (!s) return;
-
+  const song = findSong(e.songId);
+  if (!song) return;
   const photo = safeBg(e.bg);
-
-  $("modalCard").innerHTML = `
-    <button class="modal-x" onclick="closeModal()" aria-label="Isara">✕</button>
-    <div class="modal-top" style="${bgStyle(e, s)}">
-      ${photo || safeBg(s.cover) ? "" : s.emoji}
-    </div>
-    <div class="modal-body">
-      <span class="tape"></span>
-      <small>${esc(s.title)} - ${esc(s.artist)}</small>
-      <h3>${esc(e.title || s.title)}</h3>
-      <p>${esc(e.meaning)}</p>
-      <small>— ${esc(e.from)}</small><br>
-      <a class="btn" href="${s.spotify}" target="_blank">▶ Pakinggan</a>
-      <button class="btn" onclick="goToSong('${s.id}')">Tingnan ang kanta</button>
-    </div>`;
-
+  const date = formatEntryDate(e.created_at);
+  const canDelete = Boolean(currentUser && e.user_id && currentUser.id === e.user_id);
+  $("modalCard").innerHTML = `<button class="modal-x" onclick="closeModal()" aria-label="Close">✕</button>
+    <div class="modal-top" style="${bgStyle(e, song)}">${photo || safeBg(song.cover) ? "" : song.emoji}</div>
+    <div class="modal-body"><span class="tape"></span><small>${esc(song.title)} - ${esc(song.artist)}</small>
+      <h3>${esc(e.title || song.title)}</h3><p class="entry-message">${esc(e.meaning)}</p>
+      <small>— ${esc(e.from)}</small>${date ? `<small class="entry-date">Posted ${esc(date)}</small>` : ""}
+      <div class="modal-actions"><a class="btn" href="${song.spotify}" target="_blank" rel="noopener">▶ Listen on Spotify</a>
+      <button class="btn" onclick="goToSong('${esc(song.id)}')">View song</button>
+      ${canDelete ? `<button class="btn btn-danger" onclick='deleteEntry(${JSON.stringify(e.id)})'>Delete my entry</button>` : ""}</div></div>`;
   $("modal").hidden = false;
 }
+
+async function deleteEntry(id) {
+  if (!currentUser || !window.LetLirikoCloud) {
+    notify("Mag-log in muna para ma-delete ang sarili mong entry.", "error");
+    return;
+  }
+  if (!window.confirm("Sure ka bang i-delete itong entry? Hindi na ito maibabalik.")) return;
+  try {
+    await window.LetLirikoCloud.deleteCloudEntry(id);
+    const index = cloudEntries.findIndex(entry => String(entry.id) === String(id));
+    if (index >= 0) cloudEntries.splice(index, 1);
+    closeModal(); renderPreview(); renderEntries();
+    notify("Deleted na ang entry mo.", "success");
+  } catch (error) {
+    console.error("Entry deletion failed:", error);
+    notify(error.message || "Hindi na-delete ang entry. Try again.", "error");
+  }
+}
+window.deleteEntry = deleteEntry;
 
 function closeModal() {
   $("modal").hidden = true;
@@ -188,16 +203,13 @@ function renderSongs() {
 
 function renderEntries() {
   const list = DB.forSong(currentSong);
-
-  $("entryList").innerHTML = list.length
-    ? list.map(e => `
-      <div class="note" style="cursor:pointer"
-        onclick="openEntry(${e.id})">
-        <b>${esc(e.title || "Walang title")}</b>
-        <p>${esc(shorten(e.meaning, 90))}</p>
-        <small>— ${esc(e.from)}</small>
-      </div>`).join("")
-    : "<p>Wala pang entry dito. Ikaw na ang una! 💜</p>";
+  $("entryList").innerHTML = list.length ? list.map(e => {
+    const date = formatEntryDate(e.created_at);
+    return `<article class="note" tabindex="0" role="button" onclick='openEntry(${JSON.stringify(e.id)})'
+      onkeydown='if(event.key==="Enter")openEntry(${JSON.stringify(e.id)})'>
+      <b>${esc(e.title || "Untitled story")}</b><p>${esc(shorten(e.meaning, 90))}</p>
+      <small>— ${esc(e.from)}${date ? ` · ${esc(date)}` : ""}</small></article>`;
+  }).join("") : "<p>No stories yet for this song. Be the first to share one! 💜</p>";
 }
 
 function renderCredits() {
@@ -275,7 +287,7 @@ async function saveEntry(ev) {
   const from = $("from").value.trim();
 
   if (!meaning || !from) {
-    $("msg").textContent = "Lagay ka muna ng kwento at codename ha.";
+    notify(!meaning ? "Uy! Don't forget to write your story muna. 💜" : "Lagyan mo muna ng name or nickname!", "error");
     return;
   }
 
@@ -291,7 +303,7 @@ async function saveEntry(ev) {
 
   if (submitButton) submitButton.disabled = true;
 
-  $("msg").textContent = "Sine-save ang entry online...";
+  $("msg").textContent = "Saving your story...";
 
   try {
     if (
@@ -310,8 +322,8 @@ async function saveEntry(ev) {
     ev.target.reset();
     clearPhoto();
 
-    $("msg").textContent =
-      "Na-save na online! Salamat sa pag-share 💜";
+    $("msg").textContent = "";
+    notify("Yay! Na-share na ang story mo! 💜", "success");
 
     renderPreview();
     renderEntries();
@@ -319,8 +331,8 @@ async function saveEntry(ev) {
   } catch (error) {
     console.error("Entry save failed:", error);
 
-    $("msg").textContent =
-      "Hindi na-save online: " + (error.message || "May error sa Supabase.");
+    $("msg").textContent = "";
+    notify("Oops! May something went wrong. Try again later.", "error");
 
   } finally {
     if (submitButton) submitButton.disabled = false;
@@ -335,14 +347,14 @@ async function addSong(ev) {
 
   if (!m) {
     $("songMsg").textContent =
-      "Hindi ito Spotify song link. Dapat may 'open.spotify.com/track/...'";
+      "That does not look like a Spotify track link. Please paste the song link.";
     return;
   }
 
   const id = "c" + m[1];
 
   if (findSong(id) || SONGS.some(x => x.spotifyId === m[1])) {
-    $("songMsg").textContent = "Nasa list na 'yan!";
+    $("songMsg").textContent = "Added na ang song na ito!";
     return;
   }
 
@@ -362,7 +374,7 @@ async function addSong(ev) {
   } catch (err) {}
 
   if (!title) {
-    $("songMsg").textContent = "Ilagay ang title ng kanta.";
+    $("songMsg").textContent = "Please add the song title.";
     return;
   }
 
@@ -386,7 +398,7 @@ async function addSong(ev) {
   songQuery = "";
   $("songSearch").value = "";
 
-  $("songMsg").textContent = "Nadagdag na! 🎶";
+  $("songMsg").textContent = "Song added! 🎶";
 
   pickSong(id);
 }
@@ -419,3 +431,8 @@ setInterval(() => {
 
 // Load shared entries after the page and cloud script initialize.
 window.addEventListener("load", loadCloudEntries);
+window.addEventListener("letliriko-auth-change", event => {
+  currentUser = event.detail.user;
+  renderPreview();
+  renderEntries();
+});

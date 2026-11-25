@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Sulphur+Point:wght@400;700&family=Patrick+Hand&family=Caveat+Brush&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Sulphur+Point:wght@400;700&family=Patrick+Hand&family=Caveat+Brush&display=swap');
 :root{--purple:#6b4fa0;--dark:#3d2a63;--beige:#f0e2cb;--off:#fbf8f3;--pink:#f4b6c9;--yellow:#f7d774}
 *{box-sizing:border-box}
 body{margin:0;font-family:'Sulphur Point',sans-serif;background:var(--off);color:var(--dark);line-height:1.6}
@@ -118,3 +118,85 @@ button.play{border:0;cursor:pointer;font:inherit;font-size:.8rem}
 .slide::after{z-index:2}
 /* mahabang listahan ng kanta: scroll lang sa loob */
 #songList{max-height:440px;overflow-y:auto;padding-right:.3rem}
+
+/* ===== LetLiriko responsive refresh ===== */
+:root{--purple:#6b4fa0;--dark:#3d2a63;--beige:#f0e2cb;--off:#fbf8f3;--pink:#f4b6c9;--yellow:#f7d774;--danger:#a83e62}
+body{overflow-x:hidden}
+.site-nav{position:sticky;top:0;z-index:30;min-height:76px;gap:1rem;box-shadow:0 3px 12px #3d2a6320}
+.brand{display:inline-flex;align-items:center;gap:.55rem;color:var(--beige);text-decoration:none;min-width:0}
+.brand img{width:52px;height:52px;object-fit:contain;display:block}
+.brand span{font-family:'Caveat Brush',cursive;font-size:1.7rem;line-height:1}
+.nav-links{display:flex;align-items:center;justify-content:flex-end;gap:clamp(.55rem,2vw,1.4rem);flex-wrap:wrap}
+nav.site-nav .nav-links a{margin:0;padding:.4rem .2rem;white-space:nowrap}
+nav.site-nav .nav-links a.active{color:var(--yellow);text-decoration:underline;text-underline-offset:6px}
+.hero{min-height:68vh}
+.home-actions{text-align:center;padding:2rem 1rem 3rem}
+.home-actions p{margin:.3rem 0 1.2rem}
+.preview-section{padding-bottom:1.2rem}
+.slider{padding:0 2.2rem}
+#slides{gap:1rem;padding:.7rem .25rem;scroll-behavior:smooth;overscroll-behavior-x:contain}
+.arrow{top:50%;transform:translateY(-50%);z-index:5;width:2.8rem;height:2.8rem;display:grid;place-items:center;border:2px solid var(--dark);box-shadow:0 3px 0 var(--dark);font-size:1.8rem;line-height:1;padding:0;transition:transform .15s,filter .15s}
+.arrow:hover{filter:brightness(1.05);transform:translateY(-50%) scale(1.06)}
+.arrow:active{transform:translateY(-50%) scale(.96)}
+.arrow.l{left:-.1rem}.arrow.r{right:-.1rem}
+.slide{flex:0 0 min(320px,82vw)}
+.slide-text p,.note p,.modal-body .entry-message{font-family:'Lora',Georgia,serif;font-size:.95rem;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+.note p{font-size:.88rem}
+.modal-card{max-height:calc(100vh - 2rem);overflow:auto}
+.modal-body .entry-message{font-size:1rem;color:#38294e;margin:.8rem 0 1rem}
+.entry-date{display:block;margin-top:.35rem;color:#75658b}
+.modal-actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:1rem}
+.btn{transition:transform .15s,filter .15s;min-height:42px}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn:disabled{opacity:.55;cursor:wait;transform:none}
+.btn-secondary{background:var(--beige);color:var(--dark);box-shadow:0 4px 0 #bda98c}
+.btn-danger{background:var(--danger);box-shadow:0 4px 0 #71304a;color:white}
+.form-status{min-height:0}
+.muted{font-size:.85em;color:#786a8e}
+.page-shell{max-width:900px;margin:0 auto;padding:2rem 1.25rem 4rem}
+.page-heading{text-align:center;max-width:700px;margin:0 auto 1.5rem}
+.page-heading h1{font-family:'Caveat Brush',cursive;color:var(--purple);font-size:clamp(2.5rem,6vw,4rem);font-weight:400;margin:.2rem 0}
+.page-heading p{font-size:1.05rem}
+.form-panel{background:#fffdf7;padding:clamp(1.2rem,4vw,2rem);border-radius:16px;box-shadow:0 6px 18px #3d2a6320;border:1px solid #eee2d7}
+.form-panel label{margin-top:1rem}
+.form-panel input,.form-panel textarea{border-style:solid;background:#fff;width:100%;padding:.75rem .85rem}
+.form-panel textarea{resize:vertical;min-height:130px}
+.form-panel .btn{margin-top:1.1rem}
+.form-panel h2{font-size:1.8rem}
+.account-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.2rem;align-items:start}
+.account-grid[hidden],#accountDashboard[hidden]{display:none}
+.dashboard-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.dashboard-heading h2{margin:0}
+.account-entry{padding:1rem 0;border-bottom:1px solid #eadfec}
+.account-entry h3{font-size:1.35rem}
+.account-entry p{font-family:'Lora',Georgia,serif;line-height:1.65;overflow-wrap:anywhere}
+.account-entry .btn{margin-top:.7rem}
+#myEntries{margin-top:1rem}
+.toast-region{position:fixed;top:1rem;right:1rem;z-index:1000;display:grid;gap:.6rem;width:min(390px,calc(100vw - 2rem));pointer-events:none}
+.toast{display:flex;align-items:center;gap:.75rem;padding:.9rem 1rem;border-radius:14px;background:#fffdf7;color:var(--dark);border-left:5px solid var(--purple);box-shadow:0 8px 24px #21133335;font-weight:700;animation:toast-in .22s ease-out;pointer-events:auto}
+.toast span:first-child{display:grid;place-items:center;flex:none;width:27px;height:27px;border-radius:50%;background:var(--beige)}
+.toast-success{border-left-color:#4e8b67}.toast-error{border-left-color:var(--danger)}
+.toast-error span:first-child{background:#f8dce5;color:var(--danger)}
+.toast-leave{opacity:0;transform:translateY(-8px);transition:opacity .2s,transform .2s}
+@keyframes toast-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.note{cursor:pointer;transition:transform .15s,box-shadow .15s}
+.note:hover{transform:translateY(-2px);box-shadow:0 5px 12px #3d2a6325}
+.note:focus-visible,.slide:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+@media(max-width:700px){
+  .site-nav{padding:.55rem .8rem;align-items:center;flex-wrap:wrap}
+  .brand img{width:43px;height:43px}.brand span{font-size:1.45rem}
+  .nav-links{gap:.8rem;font-size:.9rem}
+  .slider{padding:0 1.8rem}
+  .arrow{width:2.5rem;height:2.5rem}
+  .account-grid{grid-template-columns:1fr}
+  .cols{gap:1.8rem}
+}
+@media(max-width:420px){
+  .site-nav{justify-content:center}
+  .brand{margin-right:auto}
+  .nav-links{width:100%;justify-content:space-between;padding:.15rem .1rem .3rem}
+  .nav-links a{font-size:.88rem}
+  .page-shell{padding:1.2rem .8rem 3rem}
+  .modal-actions .btn{flex:1 1 100%;text-align:center}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
