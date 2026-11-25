@@ -340,6 +340,7 @@ async function saveEntry(ev) {
 }
 
 // ---------- 4. ADD SONG ----------
+
 async function addSong(ev) {
   ev.preventDefault();
 
@@ -347,14 +348,14 @@ async function addSong(ev) {
 
   if (!m) {
     $("songMsg").textContent =
-      "That does not look like a Spotify track link. Please paste the song link.";
+      "Hindi ito Spotify song link. Dapat may 'open.spotify.com/track/...'";
     return;
   }
 
   const id = "c" + m[1];
 
   if (findSong(id) || SONGS.some(x => x.spotifyId === m[1])) {
-    $("songMsg").textContent = "Added na ang song na ito!";
+    $("songMsg").textContent = "Nasa list na 'yan!";
     return;
   }
 
@@ -374,7 +375,7 @@ async function addSong(ev) {
   } catch (err) {}
 
   if (!title) {
-    $("songMsg").textContent = "Please add the song title.";
+    $("songMsg").textContent = "Ilagay ang title ng kanta.";
     return;
   }
 
@@ -392,16 +393,43 @@ async function addSong(ev) {
     custom: true
   };
 
-  DB.addSong(song);
+  const submitButton = ev.target.querySelector('button[type="submit"]');
 
-  ev.target.reset();
-  songQuery = "";
-  $("songSearch").value = "";
+  if (submitButton) submitButton.disabled = true;
 
-  $("songMsg").textContent = "Song added! 🎶";
+  $("songMsg").textContent = "Sine-save ang kanta online...";
 
-  pickSong(id);
+  try {
+    if (
+      !window.LetLirikoCloud ||
+      typeof window.LetLirikoCloud.addCloudSong !== "function"
+    ) {
+      throw new Error("Hindi pa handa ang Supabase connection. I-refresh ang page.");
+    }
+
+    await window.LetLirikoCloud.addCloudSong(song);
+
+    SONGS.push(song);
+
+    ev.target.reset();
+    songQuery = "";
+    $("songSearch").value = "";
+
+    $("songMsg").textContent = "Nadagdag na online! Makikita na rin ito ng ibang visitors. 🎶";
+
+    pickSong(id);
+
+  } catch (error) {
+    console.error("Song save failed:", error);
+
+    $("songMsg").textContent =
+      "Hindi na-save online: " + (error.message || "May error sa Supabase.");
+
+  } finally {
+    if (submitButton) submitButton.disabled = false;
+  }
 }
+
 
 $("songSearch").addEventListener("input", e => {
   songQuery = e.target.value.trim();
