@@ -216,34 +216,19 @@ const ENTRY_KEYS = Object.keys(ART);
 }));
 
 const KEY = "letliriko_entries";
+localStorage.removeItem(KEY);
 
 const DB = {
-  // Return saved entries, or initialize local storage with the sample entries.
   all() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(KEY));
-      if (saved && saved.length) return saved;
-    } catch (e) {}
-    localStorage.setItem(KEY, JSON.stringify(SAMPLE_ENTRIES));
-    return SAMPLE_ENTRIES.slice();
+    return [];
   },
-  forSong(songId) { return DB.all().filter(e => e.songId === songId); },
+  forSong(songId) {
+    return [];
+  },
   add(entry) {
-    const list = DB.all();
-    entry.id = Date.now();
-    list.unshift(entry);
-    localStorage.setItem(KEY, JSON.stringify(list));
     return entry;
   },
-  reset() { localStorage.removeItem(KEY); }
-};
-
-function findSong(id) { return SONGS.find(s => s.id === id); }
-
-// User-added songs are saved in the browser; cloud integration can also store them online.
-const SONG_KEY = "letliriko_songs";
-try { JSON.parse(localStorage.getItem(SONG_KEY) || "[]").forEach(s => SONGS.push(s)); } catch (err) {}
-DB.addSong = function (s) {
-  SONGS.push(s);
-  localStorage.setItem(SONG_KEY, JSON.stringify(SONGS.filter(x => x.custom)));
+  reset() {
+    localStorage.removeItem(KEY);
+  }
 };
