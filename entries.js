@@ -8,6 +8,10 @@ const SONGS = [
   { id: "pare-ko", title: "Pare Ko", artist: "Eraserheads", album: "Ultraelectromagneticpop!", time: "5:24",
     color: "#5b4a8a", emoji: "🎸", spotifyId: "7uuirrtCr8O8fz7kQS6VUR" }
 ];
+
+function findSong(id) {
+  return SONGS.find(song => song.id === id) || SONGS[0];
+}
 // To add a song: copy its Spotify link and get the ID between /track/ and the question mark.
 // ---------- SLUGS / EMOJIS / COLORS ----------
 const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
