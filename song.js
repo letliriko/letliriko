@@ -459,6 +459,51 @@ setInterval(() => {
 
 // Load shared entries after the page and cloud script initialize.
 window.addEventListener("load", loadCloudEntries);
+
+async function loadCloudSongs() {
+  if (
+    !window.LetLirikoCloud ||
+    typeof window.LetLirikoCloud.getCloudSongs !== "function"
+  ) return;
+
+  try {
+    const rows = await window.LetLirikoCloud.getCloudSongs();
+
+    (rows || []).forEach(row => {
+      const spotifyId = String(row.id || "").replace(/^c/, "");
+
+      if (!/^[A-Za-z0-9]{22}$/.test(spotifyId)) return;
+
+      if (
+        SONGS.some(song =>
+          song.id === row.id || song.spotifyId === spotifyId
+        )
+      ) return;
+
+      SONGS.push({
+        id: String(row.id),
+        title: row.title || "Untitled",
+        artist: row.artist || "OPM",
+        album: "",
+        time: "",
+        color: "#7b5ea7",
+        emoji: "🎵",
+        spotifyId,
+        spotify: "https://open.spotify.com/track/" + spotifyId,
+        cover: "",
+        custom: true
+      });
+    });
+
+    renderSongs();
+
+  } catch (error) {
+    console.error("Could not load shared songs:", error);
+  }
+}
+
+window.addEventListener("load", loadCloudSongs);
+
 window.addEventListener("letliriko-auth-change", event => {
   currentUser = event.detail.user;
   renderPreview();
