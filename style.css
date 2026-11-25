@@ -200,3 +200,24 @@ nav.site-nav .nav-links a.active{color:var(--yellow);text-decoration:underline;t
   .modal-actions .btn{flex:1 1 100%;text-align:center}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+nav .brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  line-height: 1;
+}
+
+nav .brand img {
+  display: block;
+  width: auto;
+  height: 55px;
+  max-width: 180px;
+  object-fit: contain;
+}
+
+@media (max-width: 600px) {
+  nav .brand img {
+    height: 45px;
+    max-width: 145px;
+  }
+}
