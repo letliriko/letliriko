@@ -117,8 +117,12 @@ async function getCloudSongs() {
 
 async function addCloudSong(song) {
   const { data, error } = await supabase.from("songs").insert({
-    id: String(song.id), title: song.title, artist: song.artist || ""
+    id: String(song.id),
+    title: song.title,
+    artist: song.artist || "",
+    cover: song.cover || null
   }).select().single();
+
   if (error) throw error;
   return data;
 }
