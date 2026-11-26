@@ -10,7 +10,7 @@ const SONGS = [
 ];
 
 function findSong(id) {
-  return SONGS.find(song => song.id === id) || SONGS[0];
+  return SONGS.find(song => song.id === id);
 }
 // To add a song: copy its Spotify link and get the ID between /track/ and the question mark.
 // ---------- SLUGS / EMOJIS / COLORS ----------
