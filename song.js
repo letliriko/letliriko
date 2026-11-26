@@ -354,7 +354,7 @@ async function addSong(ev) {
 
   const id = "c" + m[1];
 
-  if (findSong(id) || SONGS.some(x => x.spotifyId === m[1])) {
+ if (SONGS.some(x => x.id === id || x.spotifyId === m[1])) {
     $("songMsg").textContent = "Nasa list na 'yan!";
     return;
   }
