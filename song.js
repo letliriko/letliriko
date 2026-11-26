@@ -490,7 +490,7 @@ async function loadCloudSongs() {
         emoji: "🎵",
         spotifyId,
         spotify: "https://open.spotify.com/track/" + spotifyId,
-        cover: "",
+        cover: row.cover || "",
         custom: true
       });
     });
