@@ -220,18 +220,30 @@ const ENTRY_KEYS = Object.keys(ART);
 }));
 
 const KEY = "letliriko_entries";
-localStorage.removeItem(KEY);
 
 const DB = {
   all() {
-    return [];
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY));
+      if (saved && saved.length) return saved;
+    } catch (e) {}
+
+    localStorage.setItem(KEY, JSON.stringify(SAMPLE_ENTRIES));
+    return SAMPLE_ENTRIES.slice();
   },
+
   forSong(songId) {
-    return [];
+    return DB.all().filter(e => e.songId === songId);
   },
+
   add(entry) {
+    const list = DB.all();
+    entry.id = Date.now();
+    list.unshift(entry);
+    localStorage.setItem(KEY, JSON.stringify(list));
     return entry;
   },
+
   reset() {
     localStorage.removeItem(KEY);
   }
