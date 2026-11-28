@@ -159,7 +159,15 @@
       });
     } catch (error) {
       console.error("Could not load Browse entries:", error);
-      browseRoot.replaceChildren(Object.assign(document.createElement("p"), { textContent: "Hindi ma-load ang entries. Check your internet connection and Supabase entries table, then refresh." }));
+      const message = document.createElement("p");
+      message.className = "browse-load-error";
+      message.textContent = "Hindi ma-load ang entries: " + (error.message || "Check internet connection and Supabase SELECT policy.");
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "btn";
+      retry.textContent = "Subukan ulit";
+      retry.addEventListener("click", () => { browseStarted = false; loadEntries(); });
+      browseRoot.replaceChildren(message, retry);
       browseStarted = false;
     }
   }

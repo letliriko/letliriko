@@ -39,7 +39,7 @@ function fromCloudEntry(row) {
   };
 }
 
-async function loadCloudEntries() {
+async function loadCloudEntries(quiet = false) {
   if (!window.LetLirikoCloud) return;
 
   try {
@@ -53,8 +53,11 @@ async function loadCloudEntries() {
 
     renderPreview();
     renderEntries();
+    return true;
   } catch (error) {
     console.error("Could not load shared entries:", error);
+    if (!quiet) notify("Hindi ma-load ang shared entries: " + (error.message || "Check Supabase SELECT policy and connection."), "error");
+    return false;
   }
 }
 
@@ -290,7 +293,7 @@ async function saveEntry(ev) {
     notify(!meaning ? "Uy! Don't forget to write your story muna. 💜" : "Lagyan mo muna ng name or nickname!", "error");
     return;
   }
-  const wordCount = meaning ? meaning.split(/\\s+/).filter(Boolean).length : 0;
+  const wordCount = meaning ? meaning.split(/\s+/).filter(Boolean).length : 0;
   if (wordCount > 1000) {
     notify("Your story is over the 1,000-word limit. Please shorten it before posting.", "error");
     $("meaningWordCount") && ($("meaningWordCount").textContent = `${wordCount.toLocaleString()} / 1,000 words`);
@@ -322,23 +325,28 @@ async function saveEntry(ev) {
     }
 
     const savedRow = await window.LetLirikoCloud.addCloudEntry(entry);
+    if (!savedRow || savedRow.id == null) throw new Error("Hindi nakumpirma ng database ang pag-save ng entry.");
 
-    cloudEntries.unshift(fromCloudEntry(savedRow));
-
-    ev.target.reset();
-    clearPhoto();
-
-    $("msg").textContent = "";
-    notify("Yay! Na-share na ang story mo! 💜", "success");
-
+    // Add immediately for instant feedback, then refresh from Supabase as the source of truth.
+    const savedEntry = fromCloudEntry(savedRow);
+    cloudEntries.unshift(savedEntry);
     renderPreview();
     renderEntries();
 
+    ev.target.reset();
+    clearPhoto();
+    $("msg").textContent = "";
+    const refreshed = await loadCloudEntries(true);
+    let successMessage = savedRow._photoUploadWarning
+      ? "Na-post ang story mo! Hindi lang na-upload ang photo, kaya album cover ang gagamitin. 💜"
+      : "Yay! Na-share na ang story mo! 💜";
+    if (!refreshed) successMessage += " Na-save ito, pero hindi ma-refresh ang shared list—check ang Supabase SELECT policy.";
+    notify(successMessage, "success");
+
   } catch (error) {
     console.error("Entry save failed:", error);
-
-    $("msg").textContent = "";
-    notify("Oops! May something went wrong. Try again later.", "error");
+    $("msg").textContent = "Hindi na-save ang entry. " + (error.message || "Subukan ulit.");
+    notify(error.message || "Hindi na-save ang entry. Check your connection and try again.", "error");
 
   } finally {
     if (submitButton) submitButton.disabled = false;
@@ -456,7 +464,7 @@ loadCovers(() => {
 $("entryForm").addEventListener("submit", saveEntry);
 
 $("meaning").addEventListener("input", () => {
-  const words = $("meaning").value.trim().split(/\\s+/).filter(Boolean).length;
+  const words = $("meaning").value.trim().split(/\s+/).filter(Boolean).length;
   const counter = $("meaningWordCount");
   if (counter) counter.textContent = `${words.toLocaleString()} / 1,000 words`;
 });
@@ -468,6 +476,7 @@ $("photo").addEventListener("change", e => {
 
 // Load shared entries after the page and cloud script initialize.
 window.addEventListener("load", loadCloudEntries);
+window.addEventListener("letliriko-cloud-ready", loadCloudEntries);
 
 async function loadCloudSongs() {
   if (

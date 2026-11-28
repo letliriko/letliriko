@@ -70,26 +70,40 @@ async function getMyCloudEntries() {
 
 async function addCloudEntry(entry) {
   let backgroundUrl = entry.bg || null;
+  let photoUploadWarning = false;
   if (backgroundUrl && backgroundUrl.startsWith("data:")) {
-    const response = await fetch(backgroundUrl);
-    const blob = await response.blob();
-    const extension = (blob.type.split("/")[1] || "jpg").replace("jpeg", "jpg");
-    const fileName = `${crypto.randomUUID()}.${extension}`;
-    const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(fileName, blob, {
-      contentType: blob.type, upsert: false
-    });
-    if (uploadError) throw uploadError;
-    const { data: publicData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
-    backgroundUrl = publicData.publicUrl;
+    try {
+      const response = await fetch(backgroundUrl);
+      const blob = await response.blob();
+      const extension = (blob.type.split("/")[1] || "jpg").replace("jpeg", "jpg");
+      const fileName = `${crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(36).slice(2)}.${extension}`;
+      const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(fileName, blob, {
+        contentType: blob.type, upsert: false
+      });
+      if (uploadError) throw uploadError;
+      const { data: publicData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
+      backgroundUrl = publicData.publicUrl;
+    } catch (photoError) {
+      // Do not lose the written story just because the optional photo bucket is misconfigured.
+      console.warn("Entry photo upload failed; saving story without photo:", photoError);
+      backgroundUrl = null;
+      photoUploadWarning = true;
+    }
   }
   const { data: sessionData } = await supabase.auth.getSession();
   const ownerId = sessionData?.session?.user?.id || null;
-  const { data, error } = await supabase.from("entries").insert({
+  const rowToSave = {
     song_id: String(entry.songId), title: entry.title || "", meaning: entry.meaning || "",
     author_name: entry.from || "Anonymous", bg_url: backgroundUrl, user_id: ownerId
-  }).select("*").single();
+  };
+  // Insert without .select(): INSERT can succeed even if the public SELECT policy
+  // is not configured yet. The page refreshes the list separately after posting.
+  const { error } = await supabase.from("entries").insert(rowToSave);
   if (error) throw error;
-  return data;
+  return {
+    id: `local-${Date.now()}`, ...rowToSave, created_at: new Date().toISOString(),
+    _photoUploadWarning: photoUploadWarning
+  };
 }
 
 async function deleteCloudEntry(entryId) {

@@ -247,3 +247,19 @@ nav .brand img {
 .browse-signature{font-family:'Patrick Hand',cursive;font-size:1.1rem;}
 body.browse-modal-open{overflow:hidden;}
 @media(max-width:600px){.browse-grid{grid-template-columns:1fr;gap:.9rem}.browse-card{height:215px}.browse-card-content{padding:.8rem .9rem}.browse-card-title{font-size:1.08rem}.browse-card-song{font-size:.76rem}.browse-card-meta{font-size:.68rem}.browse-card-excerpt{font-size:.75rem}.browse-detail-cover{min-height:190px;height:25vh}.browse-detail-content{padding:1.1rem 1rem 1.35rem}.browse-detail-meta{font-size:.78rem}}
+
+/* Browse card text legibility and true landscape grid cards */
+.browse-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:1.25rem;align-items:stretch}
+.browse-card{height:auto;min-height:225px;aspect-ratio:16/9;isolation:isolate;border-radius:14px;color:#fffdf7;font:inherit;line-height:normal;white-space:normal}
+.browse-card-art{z-index:-2}
+.browse-card-art::after{background:linear-gradient(to bottom,rgba(36,22,52,.02) 8%,rgba(36,22,52,.12) 34%,rgba(36,22,52,.9) 100%)}
+.browse-card-content{box-sizing:border-box;width:100%;max-height:100%;padding:1rem 1.1rem .95rem;gap:0;overflow:hidden;color:#fffdf7;text-align:left;white-space:normal;overflow-wrap:anywhere}
+.browse-card-title,.browse-card-song,.browse-card-meta,.browse-card-excerpt{box-sizing:border-box;width:100%;min-width:0;color:#fffdf7;text-align:left;overflow-wrap:anywhere;word-break:normal}
+.browse-card-title{font-size:clamp(1rem,1.7vw,1.25rem);line-height:1.2;max-height:2.4em;overflow:hidden;margin:0 0 .35rem}
+.browse-card-song{font-size:.78rem;line-height:1.3;max-height:2.6em;overflow:hidden;margin:0 0 .18rem}
+.browse-card-meta{font-size:.7rem;line-height:1.25;margin:0 0 .35rem;opacity:1}
+.browse-card-excerpt{font-size:.76rem;line-height:1.45;max-height:4.35em;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+.browse-detail-content .browse-story{display:block;width:100%;max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;text-align:left}
+.browse-detail-content h2{max-width:100%;white-space:normal;text-align:left}
+.browse-load-error{padding:1rem;background:#fff3f5;border-left:4px solid #a83e62;border-radius:8px;overflow-wrap:anywhere}
+@media(max-width:700px){.browse-grid{grid-template-columns:1fr}.browse-card{min-height:215px;aspect-ratio:16/9}.browse-card-content{padding:.8rem .9rem .85rem}.browse-card-title{font-size:1.08rem}.browse-card-song{font-size:.75rem}.browse-card-meta{font-size:.68rem}.browse-card-excerpt{font-size:.73rem;max-height:4.35em}}
