@@ -1,11 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Messages | LetLiriko</title><link rel="stylesheet" href="style.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Entry | LetLiriko</title><link rel="stylesheet" href="style.css"></head>
 <body>
-<nav class="site-nav"><a class="brand" href="index.html" aria-label="LetLiriko home"><img src="letliriko-logo.png" alt="LetLiriko logo"><span>LetLiriko</span></a><div class="nav-links"><a class="active" href="messages.html">Messages</a><a href="contact.html">Contact</a><a href="account.html" id="accountNav">Log in</a></div></nav>
-<section class="deco-sec preview-section"><span class="sticker small" style="right:2%;top:10px;--r:10deg">💌</span><h2>Community Messages 💌</h2><p>Tap a card to read the whole story.</p>
-  <div class="slider"><button class="arrow l" type="button" onclick="slide(-1)" aria-label="Previous entries">‹</button><div id="slides" tabindex="0" aria-label="Entry previews"></div><button class="arrow r" type="button" onclick="slide(1)" aria-label="Next entries">›</button></div>
-</section>
+<nav class="site-nav"><a class="brand" href="index.html" aria-label="LetLiriko home"><img src="letliriko-logo.png" alt="LetLiriko logo"><span>LetLiriko</span></a><div class="nav-links"><a  href="account.html" id="accountNav">Accounts</a><a  href="browse.html">Browse</a><a class="active" href="messages.html">Entry</a><a  href="contact.html">Contact</a><a href="#" id="logoutNav" hidden>Log out</a></div></nav>
 <section class="deco-sec"><span class="sticker small" style="left:1%;top:0;--r:-10deg">🎧</span><h2>Music 🎶</h2><div class="cols">
   <div class="music-column"><h3>Choose a song</h3><input id="songSearch" type="search" placeholder="Search song or artist..." aria-label="Search songs"><a id="spSearch" href="#" target="_blank" rel="noopener" hidden>Search on Spotify</a><div id="songList"></div><div id="player"></div>
     <details class="addsong"><summary>+ Add a song</summary><form id="songForm"><small>1. Find the song on Spotify. 2. Click Share → Copy Song Link. 3. Paste it here.</small><input id="songLink" type="url" placeholder="https://open.spotify.com/track/..." required><input id="songTitle" placeholder="Song title (optional)"><input id="songArtist" placeholder="Artist (optional)"><p id="songMsg" role="status"></p><button class="btn" type="submit">Add song</button></form></details>
@@ -13,7 +10,7 @@
   <div><h3>Share your story</h3><form class="card" id="entryForm"><span class="st">🌷</span><span class="st2">⭐</span>
     <label for="title">Entry title <span class="muted">(optional)</span></label><input id="title" maxlength="50" placeholder="e.g. Para sa bestie ko">
     <label>Song: <span id="formSong"></span></label>
-    <label for="meaning">What's the story behind this song? *</label><textarea id="meaning" rows="5" maxlength="400" placeholder="Share your story here..." required></textarea>
+    <label for="meaning">What's the story behind this song? *</label><textarea id="meaning" rows="5" maxlength="100000" placeholder="Share your story here..." required></textarea><small id="meaningWordCount" class="muted">0 / 1,000 words</small>
     <label for="from">Your name or nickname *</label><input id="from" maxlength="25" placeholder="e.g. Mochi" required>
     <label for="photo">Add a photo <span class="muted">(optional)</span></label><input id="photo" type="file" accept="image/*"><small>If you don't add a photo, we'll use the song's album cover.</small><div id="photoPreview"></div>
     <p id="msg" class="form-status" role="status"></p><button class="btn" type="submit">Share my story 💜</button>

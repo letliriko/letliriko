@@ -10,7 +10,7 @@ const SONGS = [
 ];
 
 function findSong(id) {
-  return SONGS.find(song => song.id === id);
+  return SONGS.find(song => song.id === id) || SONGS[0];
 }
 // To add a song: copy its Spotify link and get the ID between /track/ and the question mark.
 // ---------- SLUGS / EMOJIS / COLORS ----------
@@ -220,30 +220,18 @@ const ENTRY_KEYS = Object.keys(ART);
 }));
 
 const KEY = "letliriko_entries";
+localStorage.removeItem(KEY);
 
 const DB = {
   all() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(KEY));
-      if (saved && saved.length) return saved;
-    } catch (e) {}
-
-    localStorage.setItem(KEY, JSON.stringify(SAMPLE_ENTRIES));
-    return SAMPLE_ENTRIES.slice();
+    return [];
   },
-
   forSong(songId) {
-    return DB.all().filter(e => e.songId === songId);
+    return [];
   },
-
   add(entry) {
-    const list = DB.all();
-    entry.id = Date.now();
-    list.unshift(entry);
-    localStorage.setItem(KEY, JSON.stringify(list));
     return entry;
   },
-
   reset() {
     localStorage.removeItem(KEY);
   }

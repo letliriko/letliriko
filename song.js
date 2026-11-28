@@ -106,9 +106,9 @@ function slide(dir) {
     : 300;
 
   if (dir > 0 && box.scrollLeft + box.clientWidth >= box.scrollWidth - 5) {
-    box.scrollTo({ left: 0, behavior: "smooth" });
+    box.scrollTo({ left: 0, behavior: "auto" });
   } else {
-    box.scrollBy({ left: dir * w, behavior: "smooth" });
+    box.scrollBy({ left: dir * w, behavior: "auto" });
   }
 }
 
@@ -158,7 +158,7 @@ function closeModal() {
 function goToSong(id) {
   closeModal();
   pickSong(id);
-  $("songList").scrollIntoView({ behavior: "smooth", block: "start" });
+  $("songList").scrollIntoView({ behavior: "auto", block: "start" });
 }
 
 document.addEventListener("keydown", e => {
@@ -195,7 +195,7 @@ function renderSongs() {
         </div>
         <span class="time">${s.time}</span>
         <button class="play"
-          onclick="event.stopPropagation();pickSong('${s.id}');$('player').scrollIntoView({behavior:'smooth',block:'center'})"
+          onclick="event.stopPropagation();pickSong('${s.id}');$('player').scrollIntoView({behavior:'auto',block:'center'})"
           title="I-play dito"
           aria-label="I-play ang ${s.title}">▶</button>
       </div>`).join("");
@@ -290,6 +290,12 @@ async function saveEntry(ev) {
     notify(!meaning ? "Uy! Don't forget to write your story muna. 💜" : "Lagyan mo muna ng name or nickname!", "error");
     return;
   }
+  const wordCount = meaning ? meaning.split(/\\s+/).filter(Boolean).length : 0;
+  if (wordCount > 1000) {
+    notify("Your story is over the 1,000-word limit. Please shorten it before posting.", "error");
+    $("meaningWordCount") && ($("meaningWordCount").textContent = `${wordCount.toLocaleString()} / 1,000 words`);
+    return;
+  }
 
   const entry = {
     songId: currentSong,
@@ -354,7 +360,7 @@ async function addSong(ev) {
 
   const id = "c" + m[1];
 
- if (SONGS.some(x => x.id === id || x.spotifyId === m[1])) {
+  if (findSong(id) || SONGS.some(x => x.spotifyId === m[1])) {
     $("songMsg").textContent = "Nasa list na 'yan!";
     return;
   }
@@ -449,13 +455,16 @@ loadCovers(() => {
 
 $("entryForm").addEventListener("submit", saveEntry);
 
+$("meaning").addEventListener("input", () => {
+  const words = $("meaning").value.trim().split(/\\s+/).filter(Boolean).length;
+  const counter = $("meaningWordCount");
+  if (counter) counter.textContent = `${words.toLocaleString()} / 1,000 words`;
+});
+
 $("photo").addEventListener("change", e => {
   if (e.target.files[0]) readPhoto(e.target.files[0]);
 });
 
-setInterval(() => {
-  if ($("modal").hidden) slide(1);
-}, 5000);
 
 // Load shared entries after the page and cloud script initialize.
 window.addEventListener("load", loadCloudEntries);
@@ -490,7 +499,7 @@ async function loadCloudSongs() {
         emoji: "🎵",
         spotifyId,
         spotify: "https://open.spotify.com/track/" + spotifyId,
-        cover: row.cover || "",
+        cover: "",
         custom: true
       });
     });

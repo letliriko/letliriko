@@ -12,22 +12,40 @@ function showToast(message, type = "info") {
   text.textContent = message;
   toast.append(icon, text);
   region.append(toast);
-  window.setTimeout(() => {
-    toast.classList.add("toast-leave");
-    window.setTimeout(() => toast.remove(), 250);
-  }, 3500);
+  window.setTimeout(() => toast.remove(), 3500);
 }
 window.showToast = showToast;
 
 function updateAccountNavigation(user) {
-  const link = document.getElementById("accountNav");
-  if (!link) return;
-  link.textContent = user ? `Hi, ${user.user_metadata?.username || "there"}` : "Log in";
-  link.href = "account.html";
+  const accountLink = document.getElementById("accountNav");
+  const logoutLink = document.getElementById("logoutNav");
+  if (accountLink) accountLink.textContent = "Accounts";
+  if (logoutLink) logoutLink.hidden = !user;
+}
+async function refreshAccountNavigation() {
+  try {
+    const user = await window.LetLirikoCloud?.getCurrentUser?.();
+    updateAccountNavigation(user || null);
+  } catch (error) {
+    console.error("Could not read current account for navigation:", error);
+    updateAccountNavigation(null);
+  }
 }
 window.addEventListener("letliriko-auth-change", event => updateAccountNavigation(event.detail.user));
-window.addEventListener("load", async () => {
-  if (window.LetLirikoCloud?.getCurrentUser) {
-    try { updateAccountNavigation(await window.LetLirikoCloud.getCurrentUser()); } catch (error) { console.error(error); }
+window.addEventListener("letliriko-cloud-ready", refreshAccountNavigation);
+window.addEventListener("load", refreshAccountNavigation);
+
+document.getElementById("logoutNav")?.addEventListener("click", async event => {
+  event.preventDefault();
+  const cloud = window.LetLirikoCloud;
+  if (!cloud?.signOut) { showToast("Account service isn't ready yet. Please try again.", "error"); return; }
+  try {
+    await cloud.signOut();
+    updateAccountNavigation(null);
+    showToast("Logged out na. See you again! 💜", "success");
+    if (!/account\.html$/i.test(window.location.pathname)) window.location.href = "account.html";
+  } catch (error) {
+    console.error("Logout failed:", error);
+    showToast(error.message || "Couldn't log out right now. Please try again.", "error");
   }
 });

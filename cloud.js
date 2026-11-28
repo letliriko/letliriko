@@ -82,10 +82,11 @@ async function addCloudEntry(entry) {
     const { data: publicData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
     backgroundUrl = publicData.publicUrl;
   }
+  const { data: sessionData } = await supabase.auth.getSession();
+  const ownerId = sessionData?.session?.user?.id || null;
   const { data, error } = await supabase.from("entries").insert({
     song_id: String(entry.songId), title: entry.title || "", meaning: entry.meaning || "",
-    author_name: entry.from || "Anonymous", bg_url: backgroundUrl
-    // user_id is assigned by the database default auth.uid(); anonymous entries remain ownerless.
+    author_name: entry.from || "Anonymous", bg_url: backgroundUrl, user_id: ownerId
   }).select("*").single();
   if (error) throw error;
   return data;
@@ -117,12 +118,8 @@ async function getCloudSongs() {
 
 async function addCloudSong(song) {
   const { data, error } = await supabase.from("songs").insert({
-    id: String(song.id),
-    title: song.title,
-    artist: song.artist || "",
-    cover: song.cover || null
+    id: String(song.id), title: song.title, artist: song.artist || ""
   }).select().single();
-
   if (error) throw error;
   return data;
 }
@@ -145,6 +142,7 @@ window.LetLirikoCloud = {
   addCloudEntry, deleteCloudEntry, sendContactMessage, getCloudSongs,
   addCloudSong, listenForEntryUpdates, testSupabaseConnection
 };
+window.dispatchEvent(new CustomEvent("letliriko-cloud-ready"));
 
 supabase.auth.onAuthStateChange((_event, session) => {
   window.LetLirikoUser = session?.user || null;

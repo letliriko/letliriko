@@ -5,18 +5,7 @@
   <title>Services | LetLiriko</title><link rel="stylesheet" href="style.css">
 </head>
 <body>
-<nav><b>LetLiriko</b><div><a href="index.html">Home</a><a href="services.html">Services</a></div></nav>
-
-<section class="deco-sec">
-  <span class="sticker small" style="right:2%;top:10px;--r:10deg">💌</span>
-  <h2>Preview 💌</h2>
-  <p>Pindot sa card para mabasa ang buong kwento.</p>
-  <div class="slider">
-    <button class="arrow l" onclick="slide(-1)" aria-label="Nakaraan">‹</button>
-    <div id="slides"></div>
-    <button class="arrow r" onclick="slide(1)" aria-label="Susunod">›</button>
-  </div>
-</section>
+<nav class="site-nav"><a class="brand" href="index.html" aria-label="LetLiriko home"><img src="letliriko-logo.png" alt="LetLiriko logo"><span>LetLiriko</span></a><div class="nav-links"><a  href="account.html" id="accountNav">Accounts</a><a  href="browse.html">Browse</a><a  href="messages.html">Entry</a><a  href="contact.html">Contact</a><a href="#" id="logoutNav" hidden>Log out</a></div></nav>
 
 <section class="deco-sec">
   <span class="sticker small" style="left:1%;top:0;--r:-10deg">🎧</span>
@@ -43,7 +32,7 @@
         <input id="title" maxlength="50" placeholder="Hal. Para sa bff ko">
         <label>Kanta: <span id="formSong"></span></label>
         <label for="meaning">Ano'ng meaning ng song na 'to sa'yo?</label>
-        <textarea id="meaning" rows="5" maxlength="400" placeholder="I-share mo na ang kwento mo..."></textarea>
+        <textarea id="meaning" rows="5" maxlength="100000" placeholder="I-share mo na ang kwento mo..."></textarea><small id="meaningWordCount" class="muted">0 / 1,000 words</small>
         <label for="from">Mula kay (codename o nickname)</label>
         <input id="from" maxlength="25" placeholder="Hal. Kuya Mochi">
         <label for="photo">Photo (optional)</label>
@@ -69,7 +58,7 @@
   <span class="sticker small" style="right:8%;top:10px;--r:8deg;animation-delay:1s">💜</span>
   <b>LetLiriko</b><p>"Bawat awit, may kuwentong nakatago."</p><p>letliriko &copy; 2026</p>
 </footer>
-<script src="entries.js"></script>
+<script src="nav.js"></script><script src="entries.js"></script>
 <script src="song.js"></script>
 <script type="module" src="cloud.js"></script>
 </body></html>

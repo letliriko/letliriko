@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Browse Stories | LetLiriko</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<nav class="site-nav"><a class="brand" href="index.html" aria-label="LetLiriko home"><img src="letliriko-logo.png" alt="LetLiriko logo"><span>LetLiriko</span></a><div class="nav-links"><a  href="account.html" id="accountNav">Accounts</a><a class="active" href="browse.html">Browse</a><a  href="messages.html">Entry</a><a  href="contact.html">Contact</a><a href="#" id="logoutNav" hidden>Log out</a></div></nav>
+<main class="page-shell browse-page"><section class="page-heading"><p class="kicker">Mga kwentong may tugtog 💜</p><h1>Browse Stories</h1><p>Explore the stories and memories shared by the LetLiriko community.</p></section>
+<div id="browseEntries" class="browse-grid" aria-live="polite"><p>Loading stories...</p></div></main>
+<div id="browseModal" class="modal" hidden><div class="modal-card browse-modal" role="dialog" aria-modal="true" aria-labelledby="browseModalTitle"><button type="button" class="btn btn-secondary browse-close" id="browseClose">Close</button><h2 id="browseModalTitle"></h2><p class="browse-song"></p><p class="browse-story"></p><small class="browse-author"></small></div></div>
+<div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div><footer><b>LetLiriko</b><p>“Bawat kanta, may kwento.”</p><p>letliriko &copy; 2026</p></footer>
+<script src="nav.js"></script><script type="module" src="cloud.js"></script><script src="browse.js"></script></body></html>
