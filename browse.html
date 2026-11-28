@@ -4,6 +4,17 @@
 <nav class="site-nav"><a class="brand" href="index.html" aria-label="LetLiriko home"><img src="letliriko-logo.png" alt="LetLiriko logo"><span>LetLiriko</span></a><div class="nav-links"><a  href="account.html" id="accountNav">Accounts</a><a class="active" href="browse.html">Browse</a><a  href="messages.html">Entry</a><a  href="contact.html">Contact</a><a href="#" id="logoutNav" hidden>Log out</a></div></nav>
 <main class="page-shell browse-page"><section class="page-heading"><p class="kicker">Mga kwentong may tugtog 💜</p><h1>Browse Stories</h1><p>Explore the stories and memories shared by the LetLiriko community.</p></section>
 <div id="browseEntries" class="browse-grid" aria-live="polite"><p>Loading stories...</p></div></main>
-<div id="browseModal" class="modal" hidden><div class="modal-card browse-modal" role="dialog" aria-modal="true" aria-labelledby="browseModalTitle"><button type="button" class="btn btn-secondary browse-close" id="browseClose">Close</button><h2 id="browseModalTitle"></h2><p class="browse-song"></p><p class="browse-story"></p><small class="browse-author"></small></div></div>
+<div id="browseModal" class="modal browse-entry-overlay" hidden>
+  <article class="browse-modal" role="dialog" aria-modal="true" aria-labelledby="browseModalTitle">
+    <button type="button" class="browse-close" id="browseClose" aria-label="Close entry">×</button>
+    <div class="browse-detail-cover" id="browseDetailCover" role="img" aria-label="Song album cover"></div>
+    <div class="browse-detail-content">
+      <div class="browse-detail-meta"><span class="browse-song"></span><time class="browse-date"></time></div>
+      <h2 id="browseModalTitle"></h2>
+      <p class="browse-story"></p>
+      <div class="browse-detail-footer"><small class="browse-author"></small><span class="browse-signature">Bawat kanta, may kwento. 💜</span></div>
+    </div>
+  </article>
+</div>
 <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div><footer><b>LetLiriko</b><p>“Bawat kanta, may kwento.”</p><p>letliriko &copy; 2026</p></footer>
-<script src="nav.js"></script><script type="module" src="cloud.js"></script><script src="browse.js"></script></body></html>
+<script src="entries.js"></script><script src="nav.js"></script><script type="module" src="cloud.js"></script><script src="browse.js"></script></body></html>
